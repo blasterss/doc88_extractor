@@ -1,72 +1,80 @@
-
 """Чтение и запись конфигурации приложения."""
 
+from __future__ import annotations
+
 import json
-import os
+from dataclasses import asdict, dataclass, field, fields
+from pathlib import Path
 from typing import Any
 
 
+@dataclass(slots=True)
 class Config:
-    """Менеджер конфигурации приложения.
+    """Конфигурация приложения."""
 
-    Автоматически загружает настройки из файла config.json.
-    Если файл отсутствует, создаёт его с конфигурацией по умолчанию.
-    """
+    version: str = "2.2.1"
+    ffdec_version: str = "version26.2.2"
 
-    def __init__(self, config_path: str = "config.json") -> None:
-        self.default_config: dict[str, Any] = {
-            "version": "2.2",
-            "ffdec_version": "version26.2.2",
-            "o_dir_path": "docs/",
-            "o_swf_path": "swf/",
-            "o_pdf_path": "pdf/",
-            "o_svg_path": "svg/",
-            "proxy_url": "https://github.chenc.dev/",
-            "ffdec_repo": "cmy2008/jpexs-decompiler",
-            "svg2pdf_repo": "cmy2008/svg2pdf",
-            "presse_repo": "cmy2008/presse",
-            "check_update": True,
-            "swf2svg": False,
-            "svgfontface": False,
-            "fix_displayrect": False,
-            "clean": True,
-            "get_more": False,
-            "path_replace": True,
-            "download_workers": 10,
-            "convert_workers": 5,
-            "pdf_scale": 1.0,
-        }
-        self.config_path = config_path
-        # Пути, используемые только во время выполнения (не сохраняются в конфигурации)
-        self.dir_path = ""
-        self.swf_path = ""
-        self.pdf_path = ""
-        self.svg_path = ""
+    o_dir_path: str = "docs/"
+    o_swf_path: str = "swf/"
+    o_pdf_path: str = "pdf/"
+    o_svg_path: str = "svg/"
 
-        if not os.path.exists(config_path):
-            self._gen_default()
-        self.load()
+    proxy_url: str = ""
+    ffdec_repo: str = "cmy2008/jpexs-decompiler"
+    svg2pdf_repo: str = "cmy2008/svg2pdf"
+    presse_repo: str = "cmy2008/presse"
 
-    def load(self) -> None:
-        """Загружает конфигурацию из JSON-файла, подставляя значения по умолчанию для отсутствующих параметров."""
-        with open(self.config_path, encoding="utf-8") as f:
-            config_data: dict = json.load(f)
+    check_update: bool = True
+    swf2svg: bool = True
+    svgfontface: bool = True
+    fix_displayrect: bool = False
+    clean: bool = True
+    get_more: bool = False
+    path_replace: bool = True
 
-        # Заполняем отсутствующие параметры значениями по умолчанию
-        for key, default_val in self.default_config.items():
-            setattr(self, key, config_data.get(key, default_val))
+    download_workers: int = 10
+    convert_workers: int = 5
+    pdf_scale: float = 1.0
 
-    def _gen_default(self) -> None:
-        """Создаёт файл конфигурации со значениями по умолчанию."""
-        with open(self.config_path, "w", encoding="utf-8") as f:
-            json.dump(self.default_config, f, indent=4)
+    dir_path: str = field(default="", init=False)
+    swf_path: str = field(default="", init=False)
+    pdf_path: str = field(default="", init=False)
+    svg_path: str = field(default="", init=False)
 
-    def reload(self) -> None:
-        """Повторно загружает конфигурацию из файла."""
-        self.load()
+    def save(self, config_path: str | Path = "config.json") -> None:
+        path = Path(config_path)
+        path.parent.mkdir(parents=True, exist_ok=True)
 
-    def save(self) -> None:
-        """Сохраняет текущую конфигурацию в JSON-файл."""
-        config_data = {key: getattr(self, key) for key in self.default_config}
-        with open(self.config_path, "w", encoding="utf-8") as f:
-            json.dump(config_data, f, indent=4)
+        data = asdict(self)
+
+        for key in ("dir_path", "swf_path", "pdf_path", "svg_path"):
+            data.pop(key, None)
+
+        with path.open("w", encoding="utf-8") as file:
+            json.dump(data, file, ensure_ascii=False, indent=4)
+            file.write("\n")
+
+    @classmethod
+    def load(cls, config_path: str | Path = "config.json") -> Config:
+        """Загрузить конфигурацию или создать файл по умолчанию."""
+        path = Path(config_path)
+
+        if not path.exists():
+            config = cls()
+            config.save(path)
+            return config
+
+        with path.open("r", encoding="utf-8") as file:
+            raw_data: Any = json.load(file)
+
+        if not isinstance(raw_data, dict):
+            raise ValueError("Корневой элемент конфигурации должен быть JSON-объектом.")
+
+        known_fields = {field.name for field in fields(cls)}
+
+        # Игнорируем неизвестные параметры и используем значения
+        # по умолчанию для отсутствующих параметров.
+        config_data = {key: value for key, value in raw_data.items() if key in known_fields}
+
+        return cls(**config_data)

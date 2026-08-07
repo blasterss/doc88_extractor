@@ -25,7 +25,7 @@ class Update:
         """Сообщает о новом выпуске приложения, не изменяя файлы."""
         try:
             release = GitHubRelease("cmy2008/doc88_extractor")
-            current = self.config.default_config["version"]
+            current = self.config.version
             if release.latest_version.lstrip("vV") > current:
                 print(f"Доступна версия приложения {release.latest_version}.")
             return True
@@ -38,7 +38,7 @@ class Update:
         if self.config.version < "1.7":
             self.catalog.upgrade_legacy_layout()
         self.catalog.rebuild_index()
-        self.config.version = self.config.default_config["version"]
+        self.config.version = self.config.version
         self.config.save()
 
     def check_tools(self) -> bool:
