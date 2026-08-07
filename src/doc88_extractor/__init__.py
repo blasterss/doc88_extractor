@@ -3,7 +3,7 @@
 import importlib
 import sys
 
-__version__ = "2.2"
+__version__ = "2.2.1"
 
 # Старые плоские пути остаются доступными без дублирования файлов в корне.
 _COMPATIBLE_MODULES = {
@@ -37,8 +37,6 @@ _COMPATIBLE_MODULES = {
 }
 
 for _old_name, _new_name in _COMPATIBLE_MODULES.items():
-    sys.modules[f"{__name__}.{_old_name}"] = importlib.import_module(
-        f".{_new_name}", __name__
-    )
+    sys.modules[f"{__name__}.{_old_name}"] = importlib.import_module(f".{_new_name}", __name__)
 
 del _old_name, _new_name

@@ -1,6 +1,6 @@
 [project]
 name = "doc88-extractor"
-version = "2.2.0"
+version = "2.2.1"
 description = "Инструмент для извлечения предпросмотра документов DOC88 в PDF"
 readme = "README.md"
 requires-python = ">=3.12"
