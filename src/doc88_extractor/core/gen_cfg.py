@@ -1,23 +1,28 @@
-# -*- coding: utf-8 -*-
-"""页面配置解析模块。
 
-将 doc88 的原始配置字典解析为结构化的页面信息对象。
+"""Модуль разбора конфигурации страниц.
+
+Преобразует исходный словарь конфигурации doc88 в структурированный объект
+с информацией о страницах документа.
 """
 
 from dataclasses import dataclass
 
-from coder import decode, encode, key2
+from .coder import decode, encode, key2
 
 
 @dataclass
 class PageURL:
-    """页面文件的名称和下载 URL。"""
+    """Имя файла страницы и URL для его загрузки."""
     name: str
     url: str
 
 
 class GenConfig:
-    """文档页面配置，封装所有页面元信息和 URL 生成逻辑。"""
+    """Конфигурация страниц документа.
+
+    Содержит метаданные документа и предоставляет методы для формирования
+    URL файлов PH и PK.
+    """
 
     def __init__(self, config: dict) -> None:
         self.header_info: str = config["headerInfo"]
@@ -37,27 +42,28 @@ class GenConfig:
         self.headnums: list[str] = self.header_info.replace('"', "").split(",")
 
     def ph_nums(self) -> int:
-        """返回 PH 文件总数。"""
+        """Возвращает общее количество файлов PH."""
         return len(self.headnums)
 
     def ph_num(self, page: int) -> int:
-        """返回指定页面所引用的 PH 层级编号。"""
+        """Возвращает номер уровня PH, используемого указанной страницей."""
         pageid = self.pageids[page - 1].split("-")
         return int(pageid[0])
 
     def ph(self, level: int) -> PageURL:
-        """生成指定层级的 PH 文件 URL。"""
+        """Формирует URL файла PH для указанного уровня."""
         name = (
             "getebt-"
             + encode(
-                f"{level}-0-{self.headnums[level - 1]}-{self.p_swf}", key2
+                f"{level}-0-{self.headnums[level - 1]}-{self.p_swf}",
+                key2,
             )
             + ".ebt"
         )
         return PageURL(name=name, url=f"{self.ebt_host}/{name}")
 
     def pk(self, page: int) -> PageURL:
-        """生成指定页面的 PK 文件 URL。"""
+        """Формирует URL файла PK для указанной страницы."""
         pageid = self.pageids[page - 1].split("-")
         level_num = int(pageid[0])
         name = (

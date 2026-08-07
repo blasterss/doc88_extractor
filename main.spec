@@ -2,8 +2,8 @@
 
 
 a = Analysis(
-    ['main.py'],
-    pathex=[],
+    ['packaging/pyinstaller_entry.py'],
+    pathex=['src'],
     binaries=[],
     datas=[],
     hiddenimports=['chardet'],
@@ -40,5 +40,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='main',
+    name='doc88_extractor',
 )

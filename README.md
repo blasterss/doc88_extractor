@@ -1,91 +1,178 @@
-## 简介 / Introduction
+# DOC88 Extractor
 
-一个可以完整提取道客巴巴预览文档（非截图）的工具。  
-A tool to extract and convert doc88 documents (non-screenshot).
+Инструмент для извлечения доступного предпросмотра документов DOC88 без
+преобразования страниц в снимки экрана. Текст, изображения и векторные фигуры
+по возможности сохраняются в итоговом PDF.
 
+> Используйте программу только для материалов, к которым у вас есть законный
+> доступ. Соблюдайте авторские права, условия DOC88 и местное законодательство.
 
-## 特点 / Features
+## Возможности
 
-- 利用 [JPEXS Free Flash Decompiler](https://github.com/jindrapetrik/jpexs-decompiler) (以下简称 ffdec) 工具，几乎完美转换文档，保留原始文本、形状与图片。  
-    Powered by [JPEXS Free Flash Decompiler](https://github.com/jindrapetrik/jpexs-decompiler), this tool preserves original text, shapes, and images—almost identical to the source.
-- 适用文档范围：几乎所有  
-    It's available for almost all documents.
-    
-## 安装 / Installation
+- загрузка документа по ссылке DOC88, числовому ID, данным `m_main` или каталогу
+  с исходными файлами EBT;
+- восстановление страниц в SWF из пар PH/PK;
+- преобразование SWF в PDF через
+  [JPEXS Free Flash Decompiler](https://github.com/jindrapetrik/jpexs-decompiler);
+- дополнительный маршрут SWF → SVG → PDF;
+- параллельная загрузка и конвертация;
+- возобновление обработки по локальному файлу прогресса.
 
-### Python
+Проект работает с доступными сайтом данными предпросмотра. Результат зависит от
+формата конкретного документа и совместимости внешних инструментов.
 
-- 需要 Python 3.10 或更高版本。  
-    Requires Python 3.10 or newer.
+## Требования
 
-安装依赖：
+- Python 3.12 или новее;
+- Java 17 или новее для запуска ffdec;
+- Windows x86-64, Linux x86-64/ARM64, macOS x86-64/ARM64 либо Android ARM64
+  для автоматически загружаемых вспомогательных программ.
 
-```bash
-pip3 install retrying requests curl_cffi xmltodict
-```
+При первом запуске приложение создаёт `config.json` и при необходимости
+предлагает загрузить ffdec, `presse` и `svg2pdf`.
 
-### Java
+## Установка
 
-- 需要安装 Java 才能进行文档转换（推荐 Java 17）:  
-    Requires Java (recommended: version 17):  
-    [Microsoft Build of OpenJDK 17 for Windows x64](https://aka.ms/download-jdk/microsoft-jdk-17.0.14-windows-x64.msi)
-
-### SVG 转换 / SVG Converting
-- 若启用 swf2svg，程序将自动下载 swf2svg 以实现 SVG 到 PDF 的转换。若安装失败，可尝试从 [typst/svg2pdf](https://github.com/typst/svg2pdf) 编译。  
-    If swf2svg is enabled, the tool will download swf2svg automatically to perform SVG-to-PDF conversion. if installation fails, try building it from [typst/svg2pdf](https://github.com/typst/svg2pdf).
-
-- 支持平台 / support platform:  
-    Windows (x86_64) / Linux (x86_64/arm64) / MacOS (x86_64/arm64) / Android (arm64)
-
-## 如何使用 / How to Use
-
-在程序目录下运行：
+Рекомендуемый способ с [uv](https://docs.astral.sh/uv/):
 
 ```bash
-python3 main.py
+uv sync
+uv run doc88-extractor
 ```
 
-- 控制台输入以下任意一种内容并回车：  
-    Enter any of the following into the console and press Enter:
-1. doc88 链接 / Doc88 URL
-2. 文档 ID(链接中 `p-` 后面的数字) / Document ID (the number after `p-` in URL)
-3. 含有 ebt 文件的文件夹路径(需要原始文件名) / Folder path containing ebt files (raw filenames required)
-4. `m_main` 数据(base64 变种格式) / `m_main` data
+Обычная установка через pip:
 
-- 获取 `m_main` 数据的方法： / How to get the `m_main` data:
-1. 浏览器打开文档网页 / Open the document page in browser
-2. 打开 `开发者工具`，转到 `控制台` 选项卡 / 	Open `DevTools` and switch to the `Console` tab.
-3. 手动输入`允许粘贴`并回车，启用粘贴功能 / Type `allow pasting` manually then enter. This will allow you to paste code.
-4. 执行以下代码，即可一键复制 `m_main` 数据 / Run the code below to copy the `m_main` data in a single click.
-    ```js
-    (match = document.documentElement.outerHTML.match(/m_main\.init\("([^"]*)"\);/)) ? (copy(match[1]), console.log('Success.')) : console.log('Not found.')
-    ```
-- 首次运行会生成配置文件，检测更新并下载 ffdec 和 presse（用于 PDF 合并）。  
-    On first run, there will be a configuration file `config.json`, then check the updates and download the ffdec and presse(uses for pdf merging).
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -e .
+doc88-extractor
+```
 
+В Windows активация окружения выполняется командой
+`.venv\Scripts\activate`.
 
-## 配置 / Configuration
-### 说明 / Description
-默认情况下配置在 `config.json` 文件中，主要说明如下：
+Приложение также можно запустить без установленной консольной команды:
 
-| 键名 / Key             | 说明                                                              | Description                                                                   |
-| ---------------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `proxy_url`            | Github 代理服务的 URL                                             | The URL of Github's proxy service.                                            |
-| `check_update`         | 是否在启动时检查更新                                              | Always check updates on startup.                                              |
-| `swf2svg`              | 是否先转换到 SVG 再转到 PDF                                       | Convert swf files to svg first.                                               |
-| `svgfontface`          | （仅 swf2pdf 为 false 时有效）在 SVG 转换中是否转换字体来呈现文本 | Only works when swf2pdf is false; using font to show texts in SVG converting. |
-| `fix_displayrect`      | 是否修正 SWF 的画布大小                                           | Fix the swf files displayrect sizes                                           |
-| `clean`                | 是否保留中间文件                                                  | Keep intermediate files.                                                      |
-| `get_more`             | 是否始终通过扫描获取页面                                          | Always via scanning to get pages.                                             |
-| `path_replace`         | 是否在 Windows 下替换过长路径                                     | Replace long paths on Windows.                                                |
-| `download_workers`     | 下载文件的线程数                                                  | Number of threads for downloading files.                                      |
-| `convert_workers`      | 转换文件的线程数                                                  | Number of threads for converting files.                                       |
-| `pdf_scale`            | 转换为 PDF 的缩放大小                                             | Scale of PDF  converting.                                                     |
+```bash
+PYTHONPATH=src python -m doc88_extractor
+```
 
-### 注意事项 / Attention
-- 使用 `fix_displayrect` 选项，可以修复某些少数文档的长宽不一致导致转换出来的文档页面变小的问题
-- 使用 `pdf_scale` 选项，例如修改为 `0.5`（建议不要小于这个值，第三方软件可能无法自动处理过小的缩放），可以减小文档文件大小并加快转换速度，但是转换出来的文档也会相应缩小
-- 使用 `swf2svg` 选项，也许会解决部分文档的字体问题或形状问题
-- 使用 `swf2svg` 选项，而不使用 `svgfontface` 选项，由于省去了文本转换过程，可以大大加快转换速度
-- 若启用 `svgfontface` 选项，由于 [typst/svg2pdf](https://github.com/typst/svg2pdf) 的缺陷，将无法转换字体，会自动替换为默认字体
-- 若启用 `svgfontface` 选项，由于 [ffdec](https://github.com/jindrapetrik/jpexs-decompiler) 的缺陷，某些形状或文本会出现转换错误
+Для просмотра доступных параметров:
+
+```bash
+doc88-extractor --help
+```
+
+## Использование
+
+После запуска введите один из вариантов:
+
+1. ссылку вида `https://www.doc88.com/p-12345678.html`;
+2. ID документа — число после `p-` в ссылке;
+3. путь к каталогу с файлами `.ebt`, у которых сохранены исходные имена;
+4. закодированную строку из вызова `m_main.init`.
+
+Чтобы получить `m_main` для страницы, откройте инструменты разработчика
+браузера, перейдите на вкладку «Консоль» и выполните:
+
+```js
+(match = document.documentElement.outerHTML.match(/m_main\.init\("([^"]*)"\);/))
+  ? (copy(match[1]), console.log("Скопировано"))
+  : console.log("Данные не найдены")
+```
+
+Браузер может потребовать вручную разрешить вставку в консоль.
+
+## Конфигурация
+
+Настройки хранятся в `config.json`.
+
+| Параметр | Назначение |
+| --- | --- |
+| `proxy_url` | Адрес прокси для загрузки выпусков с GitHub. |
+| `check_update` | Проверять обновления при запуске. |
+| `swf2svg` | Преобразовывать SWF сначала в SVG, затем в PDF. |
+| `svgfontface` | Использовать шрифты для текста при экспорте SVG. |
+| `fix_displayrect` | Исправлять размеры области отображения SWF. |
+| `clean` | Удалять промежуточные файлы после успешной обработки. |
+| `get_more` | Пытаться найти дополнительные страницы сканированием. |
+| `path_replace` | Поддерживать длинные пути Windows. |
+| `download_workers` | Число параллельных загрузок. |
+| `convert_workers` | Число параллельных преобразований. |
+| `pdf_scale` | Масштаб страниц итогового PDF. |
+
+Полезные замечания:
+
+- `fix_displayrect` помогает, если страница получилась меньше ожидаемого из-за
+  неверных размеров холста;
+- уменьшение `pdf_scale` сокращает размер файла и ускоряет обработку, но
+  уменьшает саму страницу; значение ниже `0.5` поддерживается не всеми
+  программами;
+- маршрут через SVG иногда исправляет проблемы со шрифтами или фигурами;
+- отключение `svgfontface` ускоряет экспорт SVG;
+- при включённом `svgfontface` `svg2pdf` может заменить недоступный шрифт, а
+  ffdec в отдельных документах может неточно преобразовать текст или фигуры.
+
+## Архитектура
+
+Исходный код оформлен как пакет `doc88_extractor`:
+
+```text
+src/doc88_extractor/
+├── app/
+│   └── workflow.py              # прикладной сценарий документа
+├── core/
+│   ├── config.py                # настройки приложения
+│   ├── coder.py                 # вариант Base64 DOC88
+│   ├── gen_cfg.py               # модель документа и URL страниц
+│   └── document_config.py       # построение конфигурации из PH/PK
+├── ebt/
+│   ├── ebt_parser.py            # разбор локальных EBT и XML
+│   ├── get_more.py              # поиск дополнительных страниц
+│   └── compressor.py            # восстановление SWF из PH/PK
+├── services/
+│   ├── document_source.py       # URL, XML и m_main
+│   ├── page_downloader.py       # загрузка PH/PK
+│   ├── conversion.py            # SWF/SVG/PDF
+│   ├── workspace.py             # рабочие каталоги
+│   └── document_catalog.py      # индекс локальных документов
+├── infrastructure/
+│   ├── file_system.py           # пути, файлы и архивы
+│   ├── http_client.py           # HTTP и загрузка файлов
+│   ├── logging_utils.py         # файловый журнал
+│   └── release_client.py        # GitHub Releases
+├── toolchain/
+│   ├── updater.py               # координатор проверки инструментов
+│   ├── java_runtime.py          # обнаружение Java
+│   ├── ffdec_manager.py         # установка и настройка ffdec
+│   └── binary_tools.py          # presse и svg2pdf
+├── presentation/
+│   ├── cli.py                   # аргументы командной строки
+│   ├── interaction.py           # интерактивный маршрутизатор
+│   └── console.py               # консольные подтверждения
+├── compat/
+│   ├── application.py           # прежний прикладной API
+│   ├── ebt_import.py            # прежний API импорта EBT
+│   └── utils.py                 # прежний API утилит
+├── __init__.py
+└── __main__.py
+```
+
+Зависимости направлены внутрь: интерфейс вызывает сценарий, сценарий управляет
+сервисами загрузки и преобразования, а те используют узкие инфраструктурные
+адаптеры. Конфигурация передаётся явно; её импорт больше не создаёт файлы.
+
+`pyproject.toml` содержит зависимости, метаданные сборки, CLI-команду и
+настройки инструментов разработки. `main.spec` используется для сборки
+самостоятельного приложения с PyInstaller.
+
+## Разработка
+
+```bash
+PYTHONPATH=src python -m compileall -q src
+PYTHONPATH=src python -m unittest discover -s tests
+```
+
+История исследования формата EBT и процесса преобразования приведена в
+[ABOUT.md](ABOUT.md).

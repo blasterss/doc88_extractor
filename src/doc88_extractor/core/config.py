@@ -1,8 +1,5 @@
-# -*- coding: utf-8 -*-
-"""配置管理模块。
 
-提供 Config 类用于读写 config.json，以及全局默认配置实例 cfg2。
-"""
+"""Чтение и запись конфигурации приложения."""
 
 import json
 import os
@@ -10,9 +7,10 @@ from typing import Any
 
 
 class Config:
-    """应用程序配置管理。
+    """Менеджер конфигурации приложения.
 
-    自动从 config.json 加载配置，若文件不存在则使用默认值生成。
+    Автоматически загружает настройки из файла config.json.
+    Если файл отсутствует, создаёт его с конфигурацией по умолчанию.
     """
 
     def __init__(self, config_path: str = "config.json") -> None:
@@ -26,7 +24,7 @@ class Config:
             "proxy_url": "https://github.chenc.dev/",
             "ffdec_repo": "cmy2008/jpexs-decompiler",
             "svg2pdf_repo": "cmy2008/svg2pdf",
-            "presse_repo" : "cmy2008/presse",
+            "presse_repo": "cmy2008/presse",
             "check_update": True,
             "swf2svg": False,
             "svgfontface": False,
@@ -39,7 +37,7 @@ class Config:
             "pdf_scale": 1.0,
         }
         self.config_path = config_path
-        # 运行时路径（非持久化）
+        # Пути, используемые только во время выполнения (не сохраняются в конфигурации)
         self.dir_path = ""
         self.swf_path = ""
         self.pdf_path = ""
@@ -50,29 +48,25 @@ class Config:
         self.load()
 
     def load(self) -> None:
-        """从 JSON 文件加载配置，缺失项回退到默认值。"""
-        with open(self.config_path, "r", encoding="utf-8") as f:
+        """Загружает конфигурацию из JSON-файла, подставляя значения по умолчанию для отсутствующих параметров."""
+        with open(self.config_path, encoding="utf-8") as f:
             config_data: dict = json.load(f)
 
-        # 用默认值补全缺失的键
+        # Заполняем отсутствующие параметры значениями по умолчанию
         for key, default_val in self.default_config.items():
             setattr(self, key, config_data.get(key, default_val))
 
     def _gen_default(self) -> None:
-        """生成默认配置文件。"""
+        """Создаёт файл конфигурации со значениями по умолчанию."""
         with open(self.config_path, "w", encoding="utf-8") as f:
             json.dump(self.default_config, f, indent=4)
 
     def reload(self) -> None:
-        """重新加载配置文件。"""
+        """Повторно загружает конфигурацию из файла."""
         self.load()
 
     def save(self) -> None:
-        """将当前配置保存到 JSON 文件。"""
+        """Сохраняет текущую конфигурацию в JSON-файл."""
         config_data = {key: getattr(self, key) for key in self.default_config}
         with open(self.config_path, "w", encoding="utf-8") as f:
             json.dump(config_data, f, indent=4)
-
-
-# 全局默认配置实例
-cfg2 = Config()
