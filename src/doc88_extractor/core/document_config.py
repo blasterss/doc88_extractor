@@ -25,9 +25,7 @@ def build(
         width = page.get("width")
         height = page.get("height")
         dimensions = f"{width}-{height}" if width and height else "612-858"
-        page_ids.append(
-            f"{page['level']}-{dimensions}-{page['headsize']}-{page['chunk_size']}"
-        )
+        page_ids.append(f"{page['level']}-{dimensions}-{page['headsize']}-{page['chunk_size']}")
 
     document_id = str(pages[0]["p_code"])
     return {

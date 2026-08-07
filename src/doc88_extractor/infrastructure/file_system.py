@@ -18,10 +18,19 @@ def ospath(path: str) -> str | Path:
 
 def safe_filename(value: str) -> str:
     """Заменяет запрещённые в именах файлов символы."""
-    replacements = str.maketrans({
-        "*": "＊", "|": "｜", ":": "：", "?": "？", "/": "／",
-        "<": "＜", ">": "＞", '"': "＂", "\\": "＼",
-    })
+    replacements = str.maketrans(
+        {
+            "*": "＊",
+            "|": "｜",
+            ":": "：",
+            "?": "？",
+            "/": "／",
+            "<": "＜",
+            ">": "＞",
+            '"': "＂",
+            "\\": "＼",
+        }
+    )
     return value.translate(replacements)
 
 

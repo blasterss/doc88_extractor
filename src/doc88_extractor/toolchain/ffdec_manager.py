@@ -30,8 +30,7 @@ class FFDecManager:
         if desired in release.releases:
             return release, desired
         candidates = [
-            name for name in release.releases
-            if re.fullmatch(r"ffdec_\d+\.\d+\.\d+\.zip", name)
+            name for name in release.releases if re.fullmatch(r"ffdec_\d+\.\d+\.\d+\.zip", name)
         ]
         candidates.sort(
             key=lambda name: tuple(
@@ -89,7 +88,10 @@ class FFDecManager:
         try:
             subprocess.run(
                 [
-                    "java", "-jar", self.jar_path, "-config",
+                    "java",
+                    "-jar",
+                    self.jar_path,
+                    "-config",
                     f"textExportExportFontFace={font_face},useMinimumStrokeWidth1Px=false",
                 ],
                 capture_output=True,

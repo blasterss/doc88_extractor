@@ -40,9 +40,7 @@ class InputRouter:
             print("Поддерживается каталог с исходными файлами EBT.")
             return False
         try:
-            return self.workflow.extract(
-                decode_main(value), scan_extra=self.config.get_more
-            )
+            return self.workflow.extract(decode_main(value), scan_extra=self.config.get_more)
         except Exception:
             print("Некорректный ввод.")
             return False
@@ -50,9 +48,7 @@ class InputRouter:
     def _from_url(self, url: str) -> bool:
         try:
             source = load_from_url(url)
-            return bool(source) and self.workflow.extract(
-                source, scan_extra=self.config.get_more
-            )
+            return bool(source) and self.workflow.extract(source, scan_extra=self.config.get_more)
         except Exception as error:
             print(error)
             return False
@@ -86,12 +82,9 @@ class InputRouter:
 
 def run(config: Config, *, debug: bool = False) -> int:
     """Запускает интерактивный цикл приложения."""
-    print(f"DOC88 Extractor {config.default_config['version']}")
+    print(f"DOC88 Extractor {config.version} ")
     print("Автор исходного проекта: Cuite_Piglin")
-    print(
-        "Используйте программу только для материалов, к которым у вас есть "
-        "законный доступ.\n"
-    )
+    print("Используйте программу только для материалов, к которым у вас есть законный доступ.\n")
     if not Update(config).check_tools():
         return 1
 

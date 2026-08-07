@@ -22,9 +22,7 @@ def decode_main(data: str) -> dict:
     except json.JSONDecodeError as error:
         raise ValueError("Не удалось прочитать данные m_main.") from error
     except (ValueError, UnicodeDecodeError) as error:
-        raise ValueError(
-            "Не удалось декодировать m_main: возможно, изменились ключи."
-        ) from error
+        raise ValueError("Не удалось декодировать m_main: возможно, изменились ключи.") from error
 
 
 def load_from_xml(document_id: str) -> dict:

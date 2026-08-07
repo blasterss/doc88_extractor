@@ -10,9 +10,7 @@ class JavaRuntime:
     @staticmethod
     def available() -> bool:
         try:
-            result = subprocess.run(
-                ["java", "-version"], capture_output=True, text=True
-            )
+            result = subprocess.run(["java", "-version"], capture_output=True, text=True)
             if result.returncode == 0:
                 return True
         except FileNotFoundError:
@@ -26,9 +24,11 @@ class JavaRuntime:
         if not java_home or not os.path.isfile(java):
             print("Java не найдена в PATH и JAVA_HOME.")
             return False
-        os.environ["PATH"] = os.pathsep.join([
-            os.path.join(java_home, "bin"),
-            os.environ.get("PATH", ""),
-        ])
+        os.environ["PATH"] = os.pathsep.join(
+            [
+                os.path.join(java_home, "bin"),
+                os.environ.get("PATH", ""),
+            ]
+        )
         print("Java найдена через JAVA_HOME; рекомендуется добавить её в PATH.")
         return True

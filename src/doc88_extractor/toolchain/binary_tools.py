@@ -61,9 +61,7 @@ class BinaryToolManager:
         """Проверяет запуск программы, устанавливая её при отсутствии."""
         binary = self.binary_name(tool)
         try:
-            result = subprocess.run(
-                [binary, "--version"], capture_output=True, text=True
-            )
+            result = subprocess.run([binary, "--version"], capture_output=True, text=True)
             if result.returncode == 0:
                 return True
             print(f"{tool} завершился с ошибкой: {result.stderr.strip()}")

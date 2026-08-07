@@ -50,7 +50,5 @@ class DocumentCatalog:
                 index[metadata["p_code"]] = metadata["p_name"]
             except Exception as error:
                 print(f"Не удалось прочитать индекс {metadata_path}: {error}")
-        with open(
-            os.path.join(self.root, "indexs.json"), "w", encoding="utf-8"
-        ) as file:
+        with open(os.path.join(self.root, "indexs.json"), "w", encoding="utf-8") as file:
             json.dump(index, file, ensure_ascii=False, indent=2)

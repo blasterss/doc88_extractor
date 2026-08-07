@@ -9,6 +9,7 @@ dependencies = [
     "curl-cffi>=0.16.0",
     "requests>=2.34.2",
     "retrying>=1.4.2",
+    "ruff>=0.16.2",
     "xmltodict>=1.0.4",
 ]
 

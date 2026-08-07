@@ -81,9 +81,7 @@ class ExtractionWorkflow:
         page_ids: list[str] = []
         document.p_count = 0
         for level in range(1, document.ph_nums() + 1):
-            scanner = GetMore(
-                document, level, self.config.dir_path, document.p_count
-            )
+            scanner = GetMore(document, level, self.config.dir_path, document.p_count)
             scanner.start()
             page_ids.extend(scanner.newpageids)
             document.p_count += len(scanner.newpageids)

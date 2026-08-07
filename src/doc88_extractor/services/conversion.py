@@ -31,8 +31,16 @@ class DocumentConverter:
     def fix_display_rect(self, page: int, width: str, height: str) -> None:
         subprocess.run(
             [
-                "java", "-jar", "ffdec/ffdec.jar", "-header",
-                "-set", "width", f"{width}px", "-set", "height", f"{height}px",
+                "java",
+                "-jar",
+                "ffdec/ffdec.jar",
+                "-header",
+                "-set",
+                "width",
+                f"{width}px",
+                "-set",
+                "height",
+                f"{height}px",
                 f"{self.config.swf_path}{page}.swf",
                 f"{self.config.swf_path}{page}.swf",
             ],
@@ -62,12 +70,14 @@ class DocumentConverter:
         source = ospath(f"{self.config.swf_path}{group_id}")
         if not os.path.isdir(source) or not os.listdir(source):
             return
-        destination_root = (
-            self.config.svg_path if output_format == "svg" else self.config.pdf_path
-        )
+        destination_root = self.config.svg_path if output_format == "svg" else self.config.pdf_path
         destination = f"{destination_root}{group_id}/"
         command = [
-            "java", "-jar", "ffdec/ffdec.jar", "-format", f"frame:{output_format}",
+            "java",
+            "-jar",
+            "ffdec/ffdec.jar",
+            "-format",
+            f"frame:{output_format}",
         ]
         if output_format == "pdf":
             command.extend(["-zoom", str(self.config.pdf_scale)])
@@ -108,8 +118,12 @@ class DocumentConverter:
     def merge_pdf(self, destination: str) -> None:
         result = subprocess.run(
             [
-                "./presse", "merge", f"{self.config.pdf_path}*.pdf",
-                "--optimize", "-o", destination,
+                "./presse",
+                "merge",
+                f"{self.config.pdf_path}*.pdf",
+                "--optimize",
+                "-o",
+                destination,
             ],
             capture_output=True,
             text=True,

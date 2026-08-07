@@ -1,4 +1,3 @@
-
 """Модуль поиска дополнительных страниц документа.
 
 Сканирует последовательные блоки данных на CDN и пытается обнаружить
@@ -20,9 +19,7 @@ from .compressor import Compressor
 class GetMore:
     """Выполняет поиск и загрузку скрытых страниц, выходящих за пределы предпросмотра."""
 
-    def __init__(
-        self, cfg: GenConfig, level: int, filepath: str, page: int = 0
-    ) -> None:
+    def __init__(self, cfg: GenConfig, level: int, filepath: str, page: int = 0) -> None:
         self.cfg = cfg
         self.comp = Compressor()
         self.level = level
@@ -150,7 +147,7 @@ class GetMore:
                             status = False
                         else:
                             br = f"{headsize + page_start}-{page_size}"
-                            page_data = self.PK_data[page_start:pos + 1]
+                            page_data = self.PK_data[page_start : pos + 1]
 
                             if self._test_bytearray(page_data):
                                 write_bytes(
@@ -217,9 +214,7 @@ class GetMore:
     def _get_newpageids(self) -> list[str]:
         """Формирует список новых идентификаторов страниц по результатам сканирования."""
         pid = (
-            f"{self.level}-"
-            f"{self.cfg.pageids[0].split('-')[1]}-"
-            f"{self.cfg.pageids[0].split('-')[2]}"
+            f"{self.level}-{self.cfg.pageids[0].split('-')[1]}-{self.cfg.pageids[0].split('-')[2]}"
         )
 
         for i in range(len(self.ids)):
