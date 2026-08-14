@@ -7,16 +7,21 @@ requires-python = ">=3.12"
 license = { text = "MIT" }
 dependencies = [
     "curl-cffi>=0.16.0",
+    "fastapi>=0.116.0",
     "ipykernel>=7.3.0",
     "pymupdf>=1.28.2",
     "requests>=2.34.2",
     "retrying>=1.4.2",
     "ruff>=0.16.2",
     "xmltodict>=1.0.4",
+    "jinja2>=3.1.6",
+    "python-multipart>=0.0.20",
+    "uvicorn[standard]>=0.35.0",
 ]
 
 [project.scripts]
 doc88-extractor = "doc88_extractor.presentation.cli:main"
+doc88-web = "doc88_extractor.presentation.web:main"
 
 [build-system]
 requires = ["hatchling"]

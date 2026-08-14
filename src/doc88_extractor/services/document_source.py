@@ -34,7 +34,7 @@ def load_from_xml(document_id: str) -> dict:
     return build(*parse_xml(decode(response.text, key2)))
 
 
-def load_from_url(url: str, method: int = 1) -> dict | bool:
+def load_from_url(url: str, method: int = 1, *, use_cdn_on_waf: bool | None = None) -> dict | bool:
     """Получает конфигурацию по URL через XML API или HTML страницы."""
     if f"{DOC88_DOMAIN}/p-" not in url and f"{CDN_DOMAIN}/p-" not in url:
         raise ValueError("Некорректный URL DOC88.")
@@ -46,7 +46,7 @@ def load_from_url(url: str, method: int = 1) -> dict | bool:
                 return load_from_xml(document_id)
         except (KeyError, TypeError, ExpatError) as error:
             print(f"Способ 1 не сработал, переключение на способ 2: {error}")
-        return load_from_url(url, method=2)
+        return load_from_url(url, method=2, use_cdn_on_waf=use_cdn_on_waf)
 
     response = get(url, referer=True, browser_impersonation=True)
     if response.status_code == 404:
@@ -58,8 +58,10 @@ def load_from_url(url: str, method: int = 1) -> dict | bool:
 
     if "网络环境安全验证" in response.text:
         print("Обнаружена проверка WAF.")
-        if confirm("Использовать CDN? (Y/n): "):
+        if use_cdn_on_waf is True or (
+            use_cdn_on_waf is None and confirm("Использовать CDN? (Y/n): ")
+        ):
             cdn_url = f"https://{CDN_DOMAIN}{url.split(DOC88_DOMAIN)[1]}"
-            return load_from_url(cdn_url)
+            return load_from_url(cdn_url, use_cdn_on_waf=use_cdn_on_waf)
         return False
     raise ValueError("На странице не найдены данные m_main.")
