@@ -20,5 +20,5 @@ RUN pip install --no-cache-dir uv \
 
 RUN mkdir -p /app/data
 
-EXPOSE 8000
-CMD [".venv/bin/uvicorn", "doc88_extractor.presentation.web:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers", "--forwarded-allow-ips=*"]
+EXPOSE 8080
+CMD [".venv/bin/uvicorn", "doc88_extractor.presentation.web:app", "--host", "0.0.0.0", "--port", "8080", "--proxy-headers", "--forwarded-allow-ips=*"]
